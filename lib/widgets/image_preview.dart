@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 
 /// Pantalla de vista previa con zoom/pan y animación Hero.
-/// Usa [ImagePreviewScreen] pasando:
-///  - [imagePath]: ruta del asset (p.ej. 'assets/images/card1.jpg')
-///  - [heroTag]: el mismo tag que usaste en la card para el Hero
-///  - [title]: (opcional) título en el AppBar
 class ImagePreviewScreen extends StatelessWidget {
   const ImagePreviewScreen({
     super.key,

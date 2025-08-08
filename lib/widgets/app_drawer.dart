@@ -5,9 +5,8 @@ class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   void _go(BuildContext context, String route) {
-    // Reemplaza la pantalla actual para que no se acumulen en el stack.
     if (ModalRoute.of(context)?.settings.name == route) {
-      Navigator.pop(context); // Si ya estás en esa ruta, solo cerrá el drawer
+      Navigator.pop(context);
       return;
     }
     Navigator.pushReplacementNamed(context, route);
@@ -24,7 +23,7 @@ class AppDrawer extends StatelessWidget {
           const DrawerHeader(
             decoration: BoxDecoration(color: Colors.black),
             child: Text(
-              'Secciones',
+              'Appstract',
               style: TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),

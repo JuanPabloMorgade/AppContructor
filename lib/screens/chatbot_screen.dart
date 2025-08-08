@@ -17,34 +17,71 @@ class ChatbotScreen extends StatefulWidget {
 class _ChatbotScreenState extends State<ChatbotScreen> {
   final List<ChatMessage> _messages = [];
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  void _scrollToBottom() {
+    // Espera al próximo frame para asegurar que la lista se haya renderizado
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
+    });
+  }
 
   void _handleSend(String text) {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
+
     setState(() {
+      // Mensaje del usuario
       _messages.add(ChatMessage(text: trimmed, isUser: true));
-      _messages.add(
-        const ChatMessage(text: 'Estamos trabajando en ello', isUser: false),
-      );
+      // Mostrar "Escribiendo..." del bot
+      _messages.add(const ChatMessage(text: 'Escribiendo...', isUser: false));
     });
     _controller.clear();
+    _scrollToBottom();
+
+    // Después de 1 segundo, reemplazar "Escribiendo..." por la respuesta
+    Future.delayed(const Duration(seconds: 1), () {
+      if (!mounted) return;
+      setState(() {
+        // Si el último es "Escribiendo..." (del bot), lo removemos
+        if (_messages.isNotEmpty &&
+            !_messages.last.isUser &&
+            _messages.last.text == 'Escribiendo...') {
+          _messages.removeLast();
+        }
+        // Añadimos respuesta
+        _messages.add(
+          const ChatMessage(text: 'Estamos trabajando en ello', isUser: false),
+        );
+      });
+      _scrollToBottom();
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primaryContainer;
+    final onPrimary = Theme.of(context).colorScheme.onPrimaryContainer;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: const [
-            Icon(Icons.smart_toy),
-            SizedBox(width: 8),
             Text('Chatbot IA'),
+            SizedBox(width: 8),
+            Icon(Icons.smart_toy),
           ],
         ),
       ),
@@ -53,6 +90,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
@@ -60,12 +98,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 final alignment = msg.isUser
                     ? Alignment.centerRight
                     : Alignment.centerLeft;
-                final bubbleColor = msg.isUser
-                    ? Theme.of(context).colorScheme.primaryContainer
-                    : Colors.grey.shade300;
-                final textColor = msg.isUser
-                    ? Theme.of(context).colorScheme.onPrimaryContainer
-                    : Colors.black;
+                final bubbleColor = msg.isUser ? primary : Colors.grey.shade300;
+                final textColor = msg.isUser ? onPrimary : Colors.black;
 
                 return Align(
                   alignment: alignment,
@@ -88,7 +122,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 20),
               child: Row(
                 children: [
                   Expanded(
