@@ -1,7 +1,6 @@
 // Centralizá rutas de assets, textos y constantes globales acá.
 
 /// Imágenes para las cards (se repiten en Home).
-/// Asegurate de tenerlas declaradas en pubspec.yaml bajo `assets/images/`.
 const List<String> cardImages = [
   'assets/images/card1.jpg',
   'assets/images/card2.jpg',
@@ -16,5 +15,5 @@ class AppRoutes {
   static const chatbot = '/chatbot';
   static const api2 = '/api2';
   static const api3 = '/api3';
-  static const preview = '/preview'; // nueva ruta para ImagePreviewScreen
+  static const preview = '/preview';
 }
